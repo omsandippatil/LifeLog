@@ -32,8 +32,7 @@ const Page = () => {
     { task: 'Team meeting at 2pm', done: true },
     { task: 'Code review PR #234', done: false },
     { task: 'Grocery shopping', done: false },
-    { task: 'Call dentist', done: false },
-    { task: 'Q4 presentation', done: false }
+    { task: 'Call dentist', done: false } 
   ];
 
   const screenTimeData = [

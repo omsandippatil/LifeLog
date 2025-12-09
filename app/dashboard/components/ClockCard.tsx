@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
 const ClockCard = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [pomodoroMinutes, setPomodoroMinutes] = useState(25);
   const [pomodoroRunning, setPomodoroRunning] = useState(false);
   const [pomodoroTime, setPomodoroTime] = useState(25 * 60);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    setCurrentTime(new Date());
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isClient]);
 
   useEffect(() => {
     if (pomodoroRunning && pomodoroTime > 0) {
@@ -22,17 +29,19 @@ const ClockCard = () => {
   }, [pomodoroRunning, pomodoroTime]);
 
   const getAccentColor = () => {
+    if (!currentTime) return '#007AFF';
     const hour = currentTime.getHours();
-    if (hour >= 5 && hour < 8) return '#FFCC00'; // Early Morning - Yellow
-    if (hour >= 8 && hour < 12) return '#FF9500'; // Morning - Orange
-    if (hour >= 12 && hour < 17) return '#007AFF'; // Afternoon - Blue
-    if (hour >= 17 && hour < 20) return '#FF6482'; // Evening - Pink
-    return '#BF5AF2'; // Night - Purple
+    if (hour >= 5 && hour < 8) return '#FFCC00';
+    if (hour >= 8 && hour < 12) return '#FF9500';
+    if (hour >= 12 && hour < 17) return '#007AFF';
+    if (hour >= 17 && hour < 20) return '#FF6482';
+    return '#BF5AF2';
   };
 
   const getWeatherIcon = () => {
+    if (!currentTime) return '☀️';
     const hour = currentTime.getHours();
-    const isRaining = Math.random() > 0.7; // Mock weather
+    const isRaining = Math.random() > 0.7;
     if (isRaining) return '🌧️';
     if (hour >= 6 && hour < 18) return '☀️';
     return '🌙';
@@ -53,6 +62,7 @@ const ClockCard = () => {
   };
 
   const getWeekDays = () => {
+    if (!currentTime) return [];
     const today = currentTime.getDay();
     const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     const currentDate = currentTime.getDate();
@@ -72,16 +82,61 @@ const ClockCard = () => {
     });
   };
 
-  const time = formatTime(currentTime);
-  const weekDays = getWeekDays();
-  const aqi = 42;
-  const temp = 25;
-
   const formatPomodoroTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
+
+  // Skeleton Loading State
+  if (!isClient || !currentTime) {
+    return (
+      <div 
+        className="relative bg-black rounded-xl p-4 h-full min-h-[180px] flex flex-col justify-between animate-pulse"
+        style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", monospace' }}
+      >
+        <div className="flex justify-between items-start">
+          <div className="h-3 w-24 bg-gray-800 rounded"></div>
+          <div className="h-2 w-6 bg-gray-800 rounded"></div>
+        </div>
+
+        <div className="flex items-center justify-center gap-1">
+          <div className="h-14 w-28 bg-gray-800 rounded"></div>
+          <div className="h-14 w-3 bg-gray-800 rounded opacity-20"></div>
+          <div className="h-14 w-28 bg-gray-800 rounded"></div>
+        </div>
+
+        <div>
+          <div className="rounded-lg px-2.5 py-1.5 mb-2 bg-gray-800">
+            <div className="flex justify-between items-center">
+              {[...Array(7)].map((_, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-0.5">
+                  <div className="h-2 w-2 bg-gray-700 rounded"></div>
+                  <div className="h-4 w-4 bg-gray-700 rounded-full"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.5">
+              <div className="h-4 w-8 bg-gray-800 rounded"></div>
+              <div className="h-6 w-12 bg-gray-800 rounded"></div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="h-3 w-6 bg-gray-800 rounded"></div>
+              <div className="h-4 w-8 bg-gray-800 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const time = formatTime(currentTime);
+  const weekDays = getWeekDays();
+  const aqi = 42;
+  const temp = 25;
 
   return (
     <div 
@@ -90,7 +145,6 @@ const ClockCard = () => {
       onMouseLeave={() => setIsHovered(false)}
       style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", monospace' }}
     >
-      {/* Date Header */}
       <div className="flex justify-between items-start">
         <div className="text-white text-xs font-normal tracking-tight opacity-60">
           {pomodoroRunning ? 'Focus Mode' : formatDate(currentTime)}
@@ -100,7 +154,6 @@ const ClockCard = () => {
         </div>
       </div>
 
-      {/* Main Time Display */}
       <div className="flex items-center justify-center gap-1">
         {pomodoroRunning ? (
           <div 
@@ -140,9 +193,7 @@ const ClockCard = () => {
         )}
       </div>
 
-      {/* Bottom Section */}
       <div>
-        {/* Date Strip with Week Days */}
         <div 
           className="rounded-lg px-2.5 py-1.5 mb-2"
           style={{ backgroundColor: accentColor }}
@@ -167,7 +218,6 @@ const ClockCard = () => {
           </div>
         </div>
 
-        {/* Temperature and AQI */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-1.5">
             <span className="text-base">{getWeatherIcon()}</span>
@@ -182,25 +232,21 @@ const ClockCard = () => {
         </div>
       </div>
 
-      {/* Pomodoro Overlay on Hover */}
       {isHovered && (
         <div 
           className="absolute inset-0 bg-black bg-opacity-96 rounded-xl flex flex-col justify-between p-4 transition-all duration-300"
         >
-          {/* Empty header space */}
           <div className="flex justify-between items-start">
             <div className="text-xs opacity-0">placeholder</div>
             <div className="text-[10px] opacity-0">+0</div>
           </div>
 
-          {/* Pomodoro time - matches main time position */}
           <div className="flex items-center justify-center gap-1">
             <div className="text-white font-medium leading-none tracking-tight" style={{ fontSize: '52px', fontVariantNumeric: 'tabular-nums' }}>
               {formatPomodoroTime(pomodoroTime)}
             </div>
           </div>
 
-          {/* Controls - matches bottom section */}
           <div className="flex flex-col gap-3">
             {!pomodoroRunning ? (
               <>

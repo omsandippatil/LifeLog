@@ -14,8 +14,7 @@ interface HabitsCardProps {
 const HabitsCard: React.FC<HabitsCardProps> = ({ 
   habits = [
     { name: 'Workout', streak: 12, completed: true, icon: '💪' },
-    { name: 'Meditate', streak: 8, completed: true, icon: '🧘' },
-    { name: 'Read', streak: 5, completed: false, icon: '📚' } 
+    { name: 'Meditate', streak: 8, completed: true, icon: '🧘' } 
   ]
 }) => {
   const completedCount = habits.filter(h => h.completed).length;
