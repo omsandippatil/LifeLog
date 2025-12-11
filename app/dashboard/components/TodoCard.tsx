@@ -169,16 +169,17 @@ const TodoCard: React.FC<TodoCardProps> = ({ items = [
           </span>
           <button
             onClick={() => setIsAddingTask(true)}
-            className="w-5 h-5 rounded-full bg-white flex items-center justify-center transition-all duration-400 ease-in-out"
+            className="w-5 h-5 rounded-full bg-black flex items-center justify-center transition-all duration-400 ease-in-out"
             style={{
-              opacity: isHovered ? 0.2 : 0.05,
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              opacity: isHovered ? 1 : 0.6,
               transform: isHovered ? 'scale(1.15) rotate(90deg)' : 'scale(1) rotate(0deg)'
             }}
             aria-label="Add task"
           >
             <span 
               className="text-white text-sm leading-none transition-all duration-400 ease-in-out"
-              style={{ opacity: isHovered ? 0.9 : 0.6 }}
+              style={{ opacity: 1 }}
             >
               +
             </span>
